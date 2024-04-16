@@ -1,5 +1,4 @@
 spring:
-  port: 8080
   datasource:
     url: jdbc:postgresql://localhost:5432/payment
     username: root
@@ -9,3 +8,5 @@ spring:
     hibernate:
       ddl-auto: create
 
+server:
+  port: 8082
