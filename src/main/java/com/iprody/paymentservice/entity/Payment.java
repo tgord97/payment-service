@@ -42,7 +42,7 @@ public class Payment {
     private Long transactionRefId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "sratus")
+    @Column(name = "status")
     private PaymentStatus status;
 
     @Column(name = "createdAt", nullable = false)

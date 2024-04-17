@@ -2,6 +2,7 @@ package com.iprody.paymentservice.controller;
 
 import com.iprody.paymentservice.dto.PaymentDto;
 import com.iprody.paymentservice.entity.Payment;
+import com.iprody.paymentservice.service.KafkaService;
 import com.iprody.paymentservice.service.PaymentService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -11,12 +12,16 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+import static org.apache.kafka.common.requests.DeleteAclsResponse.log;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
 
     private final PaymentService paymentService;
+
+    private final KafkaService kafkaService;
 
     private final ModelMapper modelMapper;
 
@@ -42,6 +47,12 @@ public class PaymentController {
         var paymentMono = paymentService.updatePayment(id, modelMapper.map(paymentDto, Payment.class));
         return paymentMono.flatMap(updatedPayment -> Mono.just(ResponseEntity.ok(modelMapper.map(updatedPayment, PaymentDto.class)))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build())));
+    }
+
+    @PostMapping("/send-to-kafka")
+    public ResponseEntity<PaymentDto> sendPayment(@RequestBody PaymentDto paymentDto ) {
+        kafkaService.sendPayment(paymentDto);
+        return ResponseEntity.ok(paymentDto);
     }
 
 }

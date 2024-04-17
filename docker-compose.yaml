@@ -1,0 +1,48 @@
+version: '3.8'
+
+networks:
+  payment-network:
+    driver: bridge
+
+services:
+
+  user-profile-service:
+    #    restart: unless-stopped
+    image: user-profile-service:latest
+    build:
+      context: .
+      dockerfile: user-profile/Dockerfile
+    container_name: user-profile-service
+    ports:
+      - "8080:8082"
+      - "8443:8443"
+    depends_on:
+      - postgres
+    networks:
+      - payment-network
+
+  postgres:
+    container_name: postgres-payment
+    image: postgres:14.10
+    environment:
+      POSTGRES_DB: "payment"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432"
+    networks:
+      - payment-network
+
+  pgadmin:
+    container_name: pgadmin-container-payment
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "8888:80"
+    depends_on:
+      - postgres
+    networks:
+      - payment-network
+
